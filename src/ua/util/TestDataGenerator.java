@@ -37,8 +37,12 @@ public class TestDataGenerator {
             String isbn = String.format("%013d", 1000000000000L + i);
             BookStatus status = BookStatus.values()[random.nextInt(BookStatus.values().length)];
             
-            Book book = Book.of(title, author, isbn, status);
-            repo.add(book);
+            try {
+                Book book = Book.of(title, author, isbn, status);
+                repo.add(book);
+            } catch (InvalidDataException e) {
+                logger.log(Level.WARNING, "Failed to create book {0}: {1}", new Object[]{title, e.getMessage()});
+            }
         }
         
         logger.log(Level.INFO, "Generated {0} books", count);
@@ -55,8 +59,12 @@ public class TestDataGenerator {
             String lastName = LAST_NAMES[i % LAST_NAMES.length];
             String readerId = "RD" + String.format("%05d", i + 1);
             
-            Reader reader = Reader.of(firstName, lastName, readerId);
-            repo.add(reader);
+            try {
+                Reader reader = Reader.of(firstName, lastName, readerId);
+                repo.add(reader);
+            } catch (InvalidDataException e) {
+                logger.log(Level.WARNING, "Failed to create reader: {0}", e.getMessage());
+            }
         }
         
         logger.log(Level.INFO, "Generated {0} readers", count);
@@ -73,8 +81,12 @@ public class TestDataGenerator {
             String lastName = AUTHOR_LAST_NAMES[i % AUTHOR_LAST_NAMES.length];
             int birthYear = 1900 + random.nextInt(100);
             
-            Author author = Author.of(firstName, lastName, birthYear);
-            repo.add(author);
+            try {
+                Author author = Author.of(firstName, lastName, birthYear);
+                repo.add(author);
+            } catch (InvalidDataException e) {
+                logger.log(Level.WARNING, "Failed to create author: {0}", e.getMessage());
+            }
         }
         
         logger.log(Level.INFO, "Generated {0} authors", count);
@@ -100,8 +112,12 @@ public class TestDataGenerator {
             LocalDate issueDate = LocalDate.now().minusDays(random.nextInt(30));
             LocalDate returnDate = issueDate.plusDays(14 + random.nextInt(14));
             
-            Loan loan = Loan.of(book, reader, issueDate, returnDate);
-            repo.add(loan);
+            try {
+                Loan loan = Loan.of(book, reader, issueDate, returnDate);
+                repo.add(loan);
+            } catch (InvalidDataException e) {
+                logger.log(Level.WARNING, "Failed to create loan: {0}", e.getMessage());
+            }
         }
         
         logger.log(Level.INFO, "Generated {0} loans", repo.size());
@@ -127,8 +143,12 @@ public class TestDataGenerator {
             LocalDate endDate = startDate.plusYears(1);
             MembershipType type = types[random.nextInt(types.length)];
             
-            Membership membership = Membership.of(reader, startDate, endDate, type);
-            repo.add(membership);
+            try {
+                Membership membership = Membership.of(reader, startDate, endDate, type);
+                repo.add(membership);
+            } catch (InvalidDataException e) {
+                logger.log(Level.WARNING, "Failed to create membership: {0}", e.getMessage());
+            }
         }
         
         logger.log(Level.INFO, "Generated {0} memberships", repo.size());

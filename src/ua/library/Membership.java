@@ -1,41 +1,51 @@
 package ua.library;
 
-import ua.util.Utils;
+import ua.util.DataValidator;
+import ua.util.InvalidDataException;
 import ua.enums.MembershipType;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class Membership implements Comparable<Membership> {
+    
+    private static final Logger logger = Logger.getLogger(Membership.class.getName());
     
     private Reader reader;
     private LocalDate startDate;
     private LocalDate endDate;
     private MembershipType type;
     
-    public Membership(Reader reader, LocalDate startDate, LocalDate endDate, MembershipType type) {
-        if (reader == null) {
-            throw new IllegalArgumentException("Reader cannot be null");
+    public Membership(Reader reader, LocalDate startDate, LocalDate endDate, MembershipType type) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        
+        DataValidator.validateNotNull(reader, "reader", errors);
+        DataValidator.validateNotNull(startDate, "startDate", errors);
+        DataValidator.validateNotNull(endDate, "endDate", errors);
+        DataValidator.validateNotNull(type, "type", errors);
+        DataValidator.validateDateRange(startDate, endDate, "membership period", errors);
+        
+        if (!errors.isEmpty()) {
+            logger.log(Level.SEVERE, "Failed to create Membership: {0}", errors);
+            throw new InvalidDataException(errors);
         }
-        if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("Dates cannot be null");
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("Membership type cannot be null");
-        }
-        Utils.validateDateRange(startDate, endDate, "membership period");
         
         this.reader = reader;
         this.startDate = startDate;
         this.endDate = endDate;
         this.type = type;
+        logger.log(Level.INFO, "Membership created successfully: {0} - {1}", new Object[]{reader.readerId(), type});
     }
     
-    public static Membership of(Reader reader, LocalDate startDate, LocalDate endDate, MembershipType type) {
+    public static Membership of(Reader reader, LocalDate startDate, LocalDate endDate, MembershipType type) throws InvalidDataException {
         return new Membership(reader, startDate, endDate, type);
     }
     
-    public static Membership createYearlyFromNow(Reader reader, MembershipType type) {
+    public static Membership createYearlyFromNow(Reader reader, MembershipType type) throws InvalidDataException {
         LocalDate start = LocalDate.now();
         LocalDate end = start.plusYears(1);
         return new Membership(reader, start, end, type);
@@ -45,10 +55,12 @@ public class Membership implements Comparable<Membership> {
         return reader;
     }
     
-    public void setReader(Reader reader) {
-        if (reader == null) {
-            throw new IllegalArgumentException("Reader cannot be null");
-        }
+    public void setReader(Reader reader) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        DataValidator.validateNotNull(reader, "reader", errors);
+        DataValidator.throwIfErrors(errors);
+        
+        logger.log(Level.INFO, "Membership reader updated");
         this.reader = reader;
     }
     
@@ -56,11 +68,15 @@ public class Membership implements Comparable<Membership> {
         return startDate;
     }
     
-    public void setStartDate(LocalDate startDate) {
-        if (startDate == null) {
-            throw new IllegalArgumentException("Start date cannot be null");
+    public void setStartDate(LocalDate startDate) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        DataValidator.validateNotNull(startDate, "startDate", errors);
+        if (endDate != null) {
+            DataValidator.validateDateRange(startDate, endDate, "membership period", errors);
         }
-        Utils.validateDateRange(startDate, endDate, "membership period");
+        DataValidator.throwIfErrors(errors);
+        
+        logger.log(Level.INFO, "Membership start date updated");
         this.startDate = startDate;
     }
     
@@ -68,11 +84,15 @@ public class Membership implements Comparable<Membership> {
         return endDate;
     }
     
-    public void setEndDate(LocalDate endDate) {
-        if (endDate == null) {
-            throw new IllegalArgumentException("End date cannot be null");
+    public void setEndDate(LocalDate endDate) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        DataValidator.validateNotNull(endDate, "endDate", errors);
+        if (startDate != null) {
+            DataValidator.validateDateRange(startDate, endDate, "membership period", errors);
         }
-        Utils.validateDateRange(startDate, endDate, "membership period");
+        DataValidator.throwIfErrors(errors);
+        
+        logger.log(Level.INFO, "Membership end date updated");
         this.endDate = endDate;
     }
     
@@ -80,10 +100,12 @@ public class Membership implements Comparable<Membership> {
         return type;
     }
     
-    public void setType(MembershipType type) {
-        if (type == null) {
-            throw new IllegalArgumentException("Membership type cannot be null");
-        }
+    public void setType(MembershipType type) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        DataValidator.validateNotNull(type, "type", errors);
+        DataValidator.throwIfErrors(errors);
+        
+        logger.log(Level.INFO, "Membership type updated: {0}", type);
         this.type = type;
     }
     

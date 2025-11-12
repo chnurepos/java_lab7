@@ -1,17 +1,33 @@
 package ua.library;
 
-import ua.util.Utils;
+import ua.util.DataValidator;
+import ua.util.InvalidDataException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public record Author(String firstName, String lastName, int birthYear) implements Comparable<Author> {
     
+    private static final Logger logger = Logger.getLogger(Author.class.getName());
+    
     public Author {
-        Utils.validateString(firstName, "First name");
-        Utils.validateString(lastName, "Last name");
-        Utils.validateYear(birthYear, "Birth year");
+        List<String> errors = new ArrayList<>();
+        
+        DataValidator.validateString(firstName, "firstName", errors);
+        DataValidator.validateString(lastName, "lastName", errors);
+        DataValidator.validateYear(birthYear, "birthYear", errors);
+        
+        if (!errors.isEmpty()) {
+            logger.log(Level.SEVERE, "Failed to create Author: {0}", errors);
+            throw new InvalidDataException(errors);
+        }
+        
+        logger.log(Level.INFO, "Author created successfully: {0} {1}", new Object[]{firstName, lastName});
     }
     
-    public static Author of(String firstName, String lastName, int birthYear) {
+    public static Author of(String firstName, String lastName, int birthYear) throws InvalidDataException {
         return new Author(firstName, lastName, birthYear);
     }
     

@@ -26,23 +26,30 @@ public class Main {
         
         System.out.println("\n\n=== SERIALIZATION DEMONSTRATION ===\n");
         demonstrateSerialization();
+        
+        System.out.println("\n\n=== VALIDATION DEMONSTRATION ===\n");
+        demonstrateValidation();
     }
     
     private static void demonstrateRecords() {
         System.out.println("--- 1. Records Demo ---");
         
-        Author author1 = new Author("George", "Orwell", 1903);
-        Author author2 = Author.of("Isaac", "Asimov", 1920);
-        
-        System.out.println("Author record: " + author1);
-        System.out.println("Full name: " + author1.getFullName());
-        System.out.println("Equals: " + author1.equals(author2));
-        
-        Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
-        Reader reader2 = Reader.of("Ivan", "Petrov", "RD12345");
-        
-        System.out.println("Reader record: " + reader1);
-        System.out.println("Records equality: " + reader1.equals(reader2));
+        try {
+            Author author1 = new Author("George", "Orwell", 1903);
+            Author author2 = Author.of("Isaac", "Asimov", 1920);
+            
+            System.out.println("Author record: " + author1);
+            System.out.println("Full name: " + author1.getFullName());
+            System.out.println("Equals: " + author1.equals(author2));
+            
+            Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
+            Reader reader2 = Reader.of("Ivan", "Petrov", "RD12345");
+            
+            System.out.println("Reader record: " + reader1);
+            System.out.println("Records equality: " + reader1.equals(reader2));
+        } catch (ua.util.InvalidDataException e) {
+            System.err.println("Error creating records: " + e.getMessage());
+        }
         System.out.println();
     }
     
@@ -104,49 +111,57 @@ public class Main {
     private static void demonstrateBookStatus() {
         System.out.println("--- 4. Book Status in Action ---");
         
-        Author author = Author.of("Terry", "Pratchett", 1948);
-        
-        Book book1 = Book.of("Good Omens", author, "9780060853983", BookStatus.AVAILABLE);
-        System.out.println(book1.getTitle() + ": " + book1.getStatusInfo());
-        System.out.println("Can checkout? " + book1.getStatus().isAvailableForCheckout());
-        
-        book1.setStatus(BookStatus.CHECKED_OUT);
-        System.out.println("\nAfter checkout:");
-        System.out.println(book1.getTitle() + ": " + book1.getStatusInfo());
-        System.out.println("Can checkout? " + book1.getStatus().isAvailableForCheckout());
-        
-        book1.setStatus(BookStatus.RESERVED);
-        System.out.println("\nAfter reservation:");
-        System.out.println(book1.getTitle() + ": " + book1.getStatusInfo());
-        
-        Book lostBook = Book.of("Lost Book", author, "1234567890", BookStatus.LOST);
-        System.out.println("\n" + lostBook.getTitle() + ": " + lostBook.getStatusInfo());
+        try {
+            Author author = Author.of("Terry", "Pratchett", 1948);
+            
+            Book book1 = Book.of("Good Omens", author, "9780060853983", BookStatus.AVAILABLE);
+            System.out.println(book1.getTitle() + ": " + book1.getStatusInfo());
+            System.out.println("Can checkout? " + book1.getStatus().isAvailableForCheckout());
+            
+            book1.setStatus(BookStatus.CHECKED_OUT);
+            System.out.println("\nAfter checkout:");
+            System.out.println(book1.getTitle() + ": " + book1.getStatusInfo());
+            System.out.println("Can checkout? " + book1.getStatus().isAvailableForCheckout());
+            
+            book1.setStatus(BookStatus.RESERVED);
+            System.out.println("\nAfter reservation:");
+            System.out.println(book1.getTitle() + ": " + book1.getStatusInfo());
+            
+            Book lostBook = Book.of("Lost Book", author, "1234567890", BookStatus.LOST);
+            System.out.println("\n" + lostBook.getTitle() + ": " + lostBook.getStatusInfo());
+        } catch (ua.util.InvalidDataException e) {
+            System.err.println("Error in book status demo: " + e.getMessage());
+        }
         System.out.println();
     }
     
     private static void demonstrateMembershipTypes() {
         System.out.println("--- 5. Membership Types Comparison ---");
         
-        Reader reader = Reader.of("Maria", "Ivanova", "RD99999");
-        
-        MembershipType[] allTypes = MembershipType.values();
-        
-        for (MembershipType type : allTypes) {
-            Membership membership = Membership.createYearlyFromNow(reader, type);
+        try {
+            Reader reader = Reader.of("Maria", "Ivanova", "RD99999");
             
-            System.out.println("\n" + type + " Membership:");
-            System.out.println("  Info: " + membership.getMembershipInfo());
-            System.out.println("  Monthly fee: $" + type.getMonthlyFee());
-            System.out.println("  Max books: " + type.getMaxBooks());
-            System.out.println("  Max loan days: " + type.getMaxLoanDays());
-            System.out.println("  Active: " + membership.isActive());
+            MembershipType[] allTypes = MembershipType.values();
             
-            String benefit = calculateBenefit(type);
-            System.out.println("  Special benefit: " + benefit);
+            for (MembershipType type : allTypes) {
+                Membership membership = Membership.createYearlyFromNow(reader, type);
+                
+                System.out.println("\n" + type + " Membership:");
+                System.out.println("  Info: " + membership.getMembershipInfo());
+                System.out.println("  Monthly fee: $" + type.getMonthlyFee());
+                System.out.println("  Max books: " + type.getMaxBooks());
+                System.out.println("  Max loan days: " + type.getMaxLoanDays());
+                System.out.println("  Active: " + membership.isActive());
+                
+                String benefit = calculateBenefit(type);
+                System.out.println("  Special benefit: " + benefit);
+            }
+            
+            System.out.println("\n=== COMPARISON ===");
+            compareMembershipTypes();
+        } catch (ua.util.InvalidDataException e) {
+            System.err.println("Error in membership types demo: " + e.getMessage());
         }
-        
-        System.out.println("\n=== COMPARISON ===");
-        compareMembershipTypes();
         
         System.out.println("\n=== DEMO COMPLETED ===");
     }
@@ -188,27 +203,28 @@ public class Main {
     private static void demonstrateRepository() {
         System.out.println("--- 1. Створення об'єктів різних типів ---");
         
-        Author author1 = Author.of("George", "Orwell", 1903);
-        Author author2 = Author.of("Isaac", "Asimov", 1920);
-        Author author3 = Author.of("Terry", "Pratchett", 1948);
-        
-        Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
-        Book book2 = Book.of("Foundation", author2, "9780553293357", BookStatus.CHECKED_OUT);
-        Book book3 = Book.of("Good Omens", author3, "9780060853983", BookStatus.AVAILABLE);
-        
-        Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
-        Reader reader2 = Reader.of("Maria", "Ivanova", "RD67890");
-        Reader reader3 = Reader.of("Oleg", "Sidorov", "RD11111");
-        
-        System.out.println("Створено:");
-        System.out.println("  - 3 автори: " + author1.getFullName() + ", " + 
-                          author2.getFullName() + ", " + author3.getFullName());
-        System.out.println("  - 3 книги: " + book1.getTitle() + ", " + 
-                          book2.getTitle() + ", " + book3.getTitle());
-        System.out.println("  - 3 читачі: " + reader1.getFullName() + ", " + 
-                          reader2.getFullName() + ", " + reader3.getFullName());
-        
-        System.out.println("\n--- 2. Репозиторій для книг (ISBN як унікальний ідентифікатор) ---");
+        try {
+            Author author1 = Author.of("George", "Orwell", 1903);
+            Author author2 = Author.of("Isaac", "Asimov", 1920);
+            Author author3 = Author.of("Terry", "Pratchett", 1948);
+            
+            Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
+            Book book2 = Book.of("Foundation", author2, "9780553293357", BookStatus.CHECKED_OUT);
+            Book book3 = Book.of("Good Omens", author3, "9780060853983", BookStatus.AVAILABLE);
+            
+            Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
+            Reader reader2 = Reader.of("Maria", "Ivanova", "RD67890");
+            Reader reader3 = Reader.of("Oleg", "Sidorov", "RD11111");
+            
+            System.out.println("Створено:");
+            System.out.println("  - 3 автори: " + author1.getFullName() + ", " + 
+                              author2.getFullName() + ", " + author3.getFullName());
+            System.out.println("  - 3 книги: " + book1.getTitle() + ", " + 
+                              book2.getTitle() + ", " + book3.getTitle());
+            System.out.println("  - 3 читачі: " + reader1.getFullName() + ", " + 
+                              reader2.getFullName() + ", " + reader3.getFullName());
+            
+            System.out.println("\n--- 2. Репозиторій для книг (ISBN як унікальний ідентифікатор) ---");
         GenericRepository<Book> bookRepo = new GenericRepository<>(
             book -> book.getIsbn()
         );
@@ -336,38 +352,39 @@ public class Main {
         System.out.println("--- 1. Сортування книг ---");
         BookRepository bookRepo = new BookRepository();
         
-        Author author1 = Author.of("George", "Orwell", 1903);
-        Author author2 = Author.of("Isaac", "Asimov", 1920);
-        Author author3 = Author.of("Terry", "Pratchett", 1948);
-        Author author4 = Author.of("J.K.", "Rowling", 1965);
-        
-        Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
-        Book book2 = Book.of("Foundation", author2, "9780553293357", BookStatus.CHECKED_OUT);
-        Book book3 = Book.of("Good Omens", author3, "9780060853983", BookStatus.RESERVED);
-        Book book4 = Book.of("Animal Farm", author1, "9780451526342", BookStatus.AVAILABLE);
-        
-        bookRepo.add(book4);
-        bookRepo.add(book1);
-        bookRepo.add(book3);
-        bookRepo.add(book2);
-        
-        System.out.println("Книги до сортування:");
-        bookRepo.getAll().forEach(b -> System.out.println("  - " + b.getTitle()));
-        
-        System.out.println("\nСортування за назвою (за замовчуванням):");
-        bookRepo.sortByTitle().forEach(b -> System.out.println("  - " + b.getTitle()));
-        
-        System.out.println("\nСортування за ISBN:");
-        bookRepo.sortByIsbn().forEach(b -> System.out.println("  - " + b.getIsbn() + " - " + b.getTitle()));
-        
-        System.out.println("\nСортування за статусом:");
-        bookRepo.sortByStatus().forEach(b -> System.out.println("  - " + b.getStatus() + " - " + b.getTitle()));
-        
-        System.out.println("\nСортування за назвою (зворотний порядок):");
-        bookRepo.sortByTitleDescending().forEach(b -> System.out.println("  - " + b.getTitle()));
-        
-        System.out.println("\n--- 2. Сортування читачів ---");
-        ReaderRepository readerRepo = new ReaderRepository();
+        try {
+            Author author1 = Author.of("George", "Orwell", 1903);
+            Author author2 = Author.of("Isaac", "Asimov", 1920);
+            Author author3 = Author.of("Terry", "Pratchett", 1948);
+            Author author4 = Author.of("J.K.", "Rowling", 1965);
+            
+            Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
+            Book book2 = Book.of("Foundation", author2, "9780553293357", BookStatus.CHECKED_OUT);
+            Book book3 = Book.of("Good Omens", author3, "9780060853983", BookStatus.RESERVED);
+            Book book4 = Book.of("Animal Farm", author1, "9780451526342", BookStatus.AVAILABLE);
+            
+            bookRepo.add(book4);
+            bookRepo.add(book1);
+            bookRepo.add(book3);
+            bookRepo.add(book2);
+            
+            System.out.println("Книги до сортування:");
+            bookRepo.getAll().forEach(b -> System.out.println("  - " + b.getTitle()));
+            
+            System.out.println("\nСортування за назвою (за замовчуванням):");
+            bookRepo.sortByTitle().forEach(b -> System.out.println("  - " + b.getTitle()));
+            
+            System.out.println("\nСортування за ISBN:");
+            bookRepo.sortByIsbn().forEach(b -> System.out.println("  - " + b.getIsbn() + " - " + b.getTitle()));
+            
+            System.out.println("\nСортування за статусом:");
+            bookRepo.sortByStatus().forEach(b -> System.out.println("  - " + b.getStatus() + " - " + b.getTitle()));
+            
+            System.out.println("\nСортування за назвою (зворотний порядок):");
+            bookRepo.sortByTitleDescending().forEach(b -> System.out.println("  - " + b.getTitle()));
+            
+            System.out.println("\n--- 2. Сортування читачів ---");
+            ReaderRepository readerRepo = new ReaderRepository();
         
         Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
         Reader reader2 = Reader.of("Maria", "Ivanova", "RD67890");
@@ -474,170 +491,177 @@ public class Main {
         System.out.println("\nСортування книг за identity (desc):");
         bookRepo.sortByIdentity("desc").forEach(b -> System.out.println("  - " + b.getTitle()));
         
-        System.out.println("\nСортування читачів за identity (asc):");
-        readerRepo.sortByIdentity("asc").forEach(r -> System.out.println("  - " + r.readerId() + " - " + r.getFullName()));
-        
-        System.out.println("\n=== ДЕМОНСТРАЦІЯ СОРТУВАННЯ ЗАВЕРШЕНА ===");
+            System.out.println("\nСортування читачів за identity (asc):");
+            readerRepo.sortByIdentity("asc").forEach(r -> System.out.println("  - " + r.readerId() + " - " + r.getFullName()));
+            
+            System.out.println("\n=== ДЕМОНСТРАЦІЯ СОРТУВАННЯ ЗАВЕРШЕНА ===");
+        } catch (ua.util.InvalidDataException e) {
+            System.err.println("Error in sorting demo: " + e.getMessage());
+        }
     }
     
     private static void demonstrateStreamSearch() {
         System.out.println("--- 1. Пошук книг ---");
         BookRepository bookRepo = new BookRepository();
         
-        Author author1 = Author.of("George", "Orwell", 1903);
-        Author author2 = Author.of("Isaac", "Asimov", 1920);
-        Author author3 = Author.of("Terry", "Pratchett", 1948);
-        
-        Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
-        Book book2 = Book.of("Animal Farm", author1, "9780451526342", BookStatus.CHECKED_OUT);
-        Book book3 = Book.of("Foundation", author2, "9780553293357", BookStatus.AVAILABLE);
-        Book book4 = Book.of("Good Omens", author3, "9780060853983", BookStatus.RESERVED);
-        
-        bookRepo.add(book1);
-        bookRepo.add(book2);
-        bookRepo.add(book3);
-        bookRepo.add(book4);
-        
-        System.out.println("Пошук за назвою '1984':");
-        bookRepo.findByTitle("1984").forEach(b -> System.out.println("  - " + b.getTitle()));
-        
-        System.out.println("\nПошук за назвою, що містить 'Farm':");
-        bookRepo.findByTitleContains("Farm").forEach(b -> System.out.println("  - " + b.getTitle()));
-        
-        System.out.println("\nПошук за статусом AVAILABLE:");
-        bookRepo.findByStatus(BookStatus.AVAILABLE).forEach(b -> System.out.println("  - " + b.getTitle()));
-        
-        System.out.println("\nПошук за автором:");
-        bookRepo.findByAuthor(author1).forEach(b -> System.out.println("  - " + b.getTitle()));
-        
-        System.out.println("\nВсі назви книг (map + collect):");
-        bookRepo.getAllTitles().forEach(title -> System.out.println("  - " + title));
-        
-        System.out.println("\nВсі автори (flatMap + collect):");
-        bookRepo.getAllAuthors().forEach(a -> System.out.println("  - " + a.getFullName()));
-        
-        System.out.println("\nПідрахунок за статусом (collect):");
-        bookRepo.countByStatus().forEach((status, count) -> 
-            System.out.println("  - " + status + ": " + count));
-        
-        System.out.println("\n--- 2. Пошук читачів ---");
-        ReaderRepository readerRepo = new ReaderRepository();
-        
-        Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
-        Reader reader2 = Reader.of("Maria", "Ivanova", "RD67890");
-        Reader reader3 = Reader.of("Ivan", "Sidorov", "RD11111");
-        
-        readerRepo.add(reader1);
-        readerRepo.add(reader2);
-        readerRepo.add(reader3);
-        
-        System.out.println("Пошук за ім'ям 'Ivan':");
-        readerRepo.findByFirstName("Ivan").forEach(r -> System.out.println("  - " + r.getFullName()));
-        
-        System.out.println("\nВсі імена (map + distinct + collect):");
-        readerRepo.getAllFirstNames().forEach(name -> System.out.println("  - " + name));
-        
-        System.out.println("\nПідрахунок за прізвищем (collect):");
-        readerRepo.countByLastName().forEach((lastName, count) -> 
-            System.out.println("  - " + lastName + ": " + count));
-        
-        System.out.println("\n--- 3. Пошук авторів ---");
-        AuthorRepository authorRepo = new AuthorRepository();
-        
-        Author author4 = Author.of("Stephen", "King", 1947);
-        authorRepo.add(author1);
-        authorRepo.add(author2);
-        authorRepo.add(author3);
-        authorRepo.add(author4);
-        
-        System.out.println("Пошук за діапазоном років (1900-1950):");
-        authorRepo.findByBirthYearRange(1900, 1950).forEach(a -> 
-            System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
-        
-        System.out.println("\nНайстаріший автор:");
-        authorRepo.findOldest().ifPresent(a -> 
-            System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
-        
-        System.out.println("\nСередній рік народження (reduce через average):");
-        System.out.println("  - " + authorRepo.getAverageBirthYear());
-        
-        System.out.println("\n--- 4. Пошук позик ---");
-        LoanRepository loanRepo = new LoanRepository();
-        
-        LocalDate date1 = LocalDate.now().minusDays(20);
-        LocalDate date2 = LocalDate.now().minusDays(5);
-        LocalDate date3 = LocalDate.now().minusDays(30);
-        
-        Loan loan1 = Loan.of(book1, reader1, date2, date2.plusDays(14));
-        Loan loan2 = Loan.of(book2, reader2, date1, date1.plusDays(21));
-        Loan loan3 = Loan.of(book3, reader1, date3, date3.plusDays(14));
-        
-        loanRepo.add(loan1);
-        loanRepo.add(loan2);
-        loanRepo.add(loan3);
-        
-        System.out.println("Пошук позик читача:");
-        loanRepo.findByReader(reader1).forEach(l -> 
-            System.out.println("  - " + l.getBook().getTitle() + " - " + l.getIssueDate()));
-        
-        System.out.println("\nПошук прострочених позик:");
-        loanRepo.findOverdue().forEach(l -> 
-            System.out.println("  - " + l.getBook().getTitle() + " (повернення: " + l.getReturnDate() + ")"));
-        
-        System.out.println("\nПідрахунок позик за читачем (collect):");
-        loanRepo.countByReader().forEach((reader, count) -> 
-            System.out.println("  - " + reader.getFullName() + ": " + count));
-        
-        System.out.println("\n--- 5. Пошук членства ---");
-        MembershipRepository membershipRepo = new MembershipRepository();
-        
-        LocalDate start1 = LocalDate.now().minusMonths(6);
-        LocalDate start2 = LocalDate.now().minusMonths(3);
-        
-        Membership membership1 = Membership.of(reader1, start2, start2.plusYears(1), MembershipType.PREMIUM);
-        Membership membership2 = Membership.of(reader2, start1, start1.plusYears(1), MembershipType.STANDARD);
-        Membership membership3 = Membership.of(reader3, start1, start1.plusYears(1), MembershipType.STUDENT);
-        
-        membershipRepo.add(membership1);
-        membershipRepo.add(membership2);
-        membershipRepo.add(membership3);
-        
-        System.out.println("Активні членства:");
-        membershipRepo.findActive().forEach(m -> 
-            System.out.println("  - " + m.getReader().getFullName() + " - " + m.getType()));
-        
-        System.out.println("\nПошук за типом PREMIUM:");
-        membershipRepo.findByType(MembershipType.PREMIUM).forEach(m -> 
-            System.out.println("  - " + m.getReader().getFullName()));
-        
-        System.out.println("\nПідрахунок за типом (collect):");
-        membershipRepo.countByType().forEach((type, count) -> 
-            System.out.println("  - " + type + ": " + count));
-        
-        System.out.println("\n--- 6. Термінальні операції: forEach ---");
-        System.out.println("Виведення всіх книг через forEach:");
-        bookRepo.getAll().forEach(book -> {
-            System.out.println("  - " + book.getTitle() + " (" + book.getStatus() + ")");
-        });
-        
-        System.out.println("\n--- 7. Термінальні операції: reduce ---");
-        System.out.println("Сума років народження авторів (reduce):");
-        int totalYears = authorRepo.getAll().stream()
-                .mapToInt(Author::birthYear)
-                .reduce(0, Integer::sum);
-        System.out.println("  - Сума: " + totalYears);
-        
-        System.out.println("\nМаксимальний рік народження (reduce):");
-        int maxYear = authorRepo.getAll().stream()
-                .mapToInt(Author::birthYear)
-                .reduce(Integer.MIN_VALUE, Integer::max);
-        System.out.println("  - Максимум: " + maxYear);
-        
-        System.out.println("\n--- 8. Порівняння stream vs parallelStream ---");
-        List<Book> largeBookList = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            largeBookList.add(Book.of("Book " + i, author1, "ISBN" + i, BookStatus.AVAILABLE));
-        }
+        try {
+            Author author1 = Author.of("George", "Orwell", 1903);
+            Author author2 = Author.of("Isaac", "Asimov", 1920);
+            Author author3 = Author.of("Terry", "Pratchett", 1948);
+            
+            Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
+            Book book2 = Book.of("Animal Farm", author1, "9780451526342", BookStatus.CHECKED_OUT);
+            Book book3 = Book.of("Foundation", author2, "9780553293357", BookStatus.AVAILABLE);
+            Book book4 = Book.of("Good Omens", author3, "9780060853983", BookStatus.RESERVED);
+            
+            bookRepo.add(book1);
+            bookRepo.add(book2);
+            bookRepo.add(book3);
+            bookRepo.add(book4);
+            
+            System.out.println("Пошук за назвою '1984':");
+            bookRepo.findByTitle("1984").forEach(b -> System.out.println("  - " + b.getTitle()));
+            
+            System.out.println("\nПошук за назвою, що містить 'Farm':");
+            bookRepo.findByTitleContains("Farm").forEach(b -> System.out.println("  - " + b.getTitle()));
+            
+            System.out.println("\nПошук за статусом AVAILABLE:");
+            bookRepo.findByStatus(BookStatus.AVAILABLE).forEach(b -> System.out.println("  - " + b.getTitle()));
+            
+            System.out.println("\nПошук за автором:");
+            bookRepo.findByAuthor(author1).forEach(b -> System.out.println("  - " + b.getTitle()));
+            
+            System.out.println("\nВсі назви книг (map + collect):");
+            bookRepo.getAllTitles().forEach(title -> System.out.println("  - " + title));
+            
+            System.out.println("\nВсі автори (flatMap + collect):");
+            bookRepo.getAllAuthors().forEach(a -> System.out.println("  - " + a.getFullName()));
+            
+            System.out.println("\nПідрахунок за статусом (collect):");
+            bookRepo.countByStatus().forEach((status, count) -> 
+                System.out.println("  - " + status + ": " + count));
+            
+            System.out.println("\n--- 2. Пошук читачів ---");
+            ReaderRepository readerRepo = new ReaderRepository();
+            
+            Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
+            Reader reader2 = Reader.of("Maria", "Ivanova", "RD67890");
+            Reader reader3 = Reader.of("Ivan", "Sidorov", "RD11111");
+            
+            readerRepo.add(reader1);
+            readerRepo.add(reader2);
+            readerRepo.add(reader3);
+            
+            System.out.println("Пошук за ім'ям 'Ivan':");
+            readerRepo.findByFirstName("Ivan").forEach(r -> System.out.println("  - " + r.getFullName()));
+            
+            System.out.println("\nВсі імена (map + distinct + collect):");
+            readerRepo.getAllFirstNames().forEach(name -> System.out.println("  - " + name));
+            
+            System.out.println("\nПідрахунок за прізвищем (collect):");
+            readerRepo.countByLastName().forEach((lastName, count) -> 
+                System.out.println("  - " + lastName + ": " + count));
+            
+            System.out.println("\n--- 3. Пошук авторів ---");
+            AuthorRepository authorRepo = new AuthorRepository();
+            
+            Author author4 = Author.of("Stephen", "King", 1947);
+            authorRepo.add(author1);
+            authorRepo.add(author2);
+            authorRepo.add(author3);
+            authorRepo.add(author4);
+            
+            System.out.println("Пошук за діапазоном років (1900-1950):");
+            authorRepo.findByBirthYearRange(1900, 1950).forEach(a -> 
+                System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
+            
+            System.out.println("\nНайстаріший автор:");
+            authorRepo.findOldest().ifPresent(a -> 
+                System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
+            
+            System.out.println("\nСередній рік народження (reduce через average):");
+            System.out.println("  - " + authorRepo.getAverageBirthYear());
+            
+            System.out.println("\n--- 4. Пошук позик ---");
+            LoanRepository loanRepo = new LoanRepository();
+            
+            LocalDate date1 = LocalDate.now().minusDays(20);
+            LocalDate date2 = LocalDate.now().minusDays(5);
+            LocalDate date3 = LocalDate.now().minusDays(30);
+            
+            Loan loan1 = Loan.of(book1, reader1, date2, date2.plusDays(14));
+            Loan loan2 = Loan.of(book2, reader2, date1, date1.plusDays(21));
+            Loan loan3 = Loan.of(book3, reader1, date3, date3.plusDays(14));
+            
+            loanRepo.add(loan1);
+            loanRepo.add(loan2);
+            loanRepo.add(loan3);
+            
+            System.out.println("Пошук позик читача:");
+            loanRepo.findByReader(reader1).forEach(l -> 
+                System.out.println("  - " + l.getBook().getTitle() + " - " + l.getIssueDate()));
+            
+            System.out.println("\nПошук прострочених позик:");
+            loanRepo.findOverdue().forEach(l -> 
+                System.out.println("  - " + l.getBook().getTitle() + " (повернення: " + l.getReturnDate() + ")"));
+            
+            System.out.println("\nПідрахунок позик за читачем (collect):");
+            loanRepo.countByReader().forEach((reader, count) -> 
+                System.out.println("  - " + reader.getFullName() + ": " + count));
+            
+            System.out.println("\n--- 5. Пошук членства ---");
+            MembershipRepository membershipRepo = new MembershipRepository();
+            
+            LocalDate start1 = LocalDate.now().minusMonths(6);
+            LocalDate start2 = LocalDate.now().minusMonths(3);
+            
+            Membership membership1 = Membership.of(reader1, start2, start2.plusYears(1), MembershipType.PREMIUM);
+            Membership membership2 = Membership.of(reader2, start1, start1.plusYears(1), MembershipType.STANDARD);
+            Membership membership3 = Membership.of(reader3, start1, start1.plusYears(1), MembershipType.STUDENT);
+            
+            membershipRepo.add(membership1);
+            membershipRepo.add(membership2);
+            membershipRepo.add(membership3);
+            
+            System.out.println("Активні членства:");
+            membershipRepo.findActive().forEach(m -> 
+                System.out.println("  - " + m.getReader().getFullName() + " - " + m.getType()));
+            
+            System.out.println("\nПошук за типом PREMIUM:");
+            membershipRepo.findByType(MembershipType.PREMIUM).forEach(m -> 
+                System.out.println("  - " + m.getReader().getFullName()));
+            
+            System.out.println("\nПідрахунок за типом (collect):");
+            membershipRepo.countByType().forEach((type, count) -> 
+                System.out.println("  - " + type + ": " + count));
+            
+            System.out.println("\n--- 6. Термінальні операції: forEach ---");
+            System.out.println("Виведення всіх книг через forEach:");
+            bookRepo.getAll().forEach(book -> {
+                System.out.println("  - " + book.getTitle() + " (" + book.getStatus() + ")");
+            });
+            
+            System.out.println("\n--- 7. Термінальні операції: reduce ---");
+            System.out.println("Сума років народження авторів (reduce):");
+            int totalYears = authorRepo.getAll().stream()
+                    .mapToInt(Author::birthYear)
+                    .reduce(0, Integer::sum);
+            System.out.println("  - Сума: " + totalYears);
+            
+            System.out.println("\nМаксимальний рік народження (reduce):");
+            int maxYear = authorRepo.getAll().stream()
+                    .mapToInt(Author::birthYear)
+                    .reduce(Integer.MIN_VALUE, Integer::max);
+            System.out.println("  - Максимум: " + maxYear);
+            
+            System.out.println("\n--- 8. Порівняння stream vs parallelStream ---");
+            List<Book> largeBookList = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                try {
+                    largeBookList.add(Book.of("Book " + i, author1, "ISBN" + String.format("%013d", i), BookStatus.AVAILABLE));
+                } catch (ua.util.InvalidDataException e) {
+                }
+            }
         BookRepository largeRepo = new BookRepository();
         largeBookList.forEach(largeRepo::add);
         
@@ -766,5 +790,166 @@ public class Main {
         }
         
         System.out.println("\n=== ДЕМОНСТРАЦІЯ СЕРІАЛІЗАЦІЇ ЗАВЕРШЕНА ===");
+    }
+    
+    private static void demonstrateValidation() {
+        System.out.println("--- 1. Створення об'єктів з валідними даними ---");
+        
+        try {
+            Author author = Author.of("George", "Orwell", 1903);
+            Book book = Book.of("1984", author, "9780451524935", BookStatus.AVAILABLE);
+            Reader reader = Reader.of("John", "Doe", "RD12345");
+            Loan loan = Loan.of(book, reader, LocalDate.now(), LocalDate.now().plusDays(14));
+            Membership membership = Membership.of(reader, LocalDate.now(), LocalDate.now().plusYears(1), MembershipType.STANDARD);
+            
+            System.out.println("Успішно створено:");
+            System.out.println("  - Автор: " + author.getFullName());
+            System.out.println("  - Книга: " + book.getTitle());
+            System.out.println("  - Читач: " + reader.getFullName());
+            System.out.println("  - Позика: " + loan.getBook().getTitle());
+            System.out.println("  - Членство: " + membership.getType());
+        } catch (ua.util.InvalidDataException e) {
+            System.err.println("Неочікувана помилка: " + e.getMessage());
+        }
+        
+        System.out.println("\n--- 2. Спроба створення об'єктів з невалідними даними ---");
+        
+        System.out.println("\nСпроба створення автора з порожнім ім'ям:");
+        try {
+            Author invalidAuthor = Author.of("", "Orwell", 1903);
+            System.err.println("Помилка: об'єкт не повинен бути створений");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилки: " + e.getMessage());
+            System.out.println("  Кількість помилок: " + e.getErrors().size());
+            e.getErrors().forEach(error -> System.out.println("    - " + error));
+        }
+        
+        System.out.println("\nСпроба створення автора з невалідним роком:");
+        try {
+            Author invalidAuthor = Author.of("George", "Orwell", 500);
+            System.err.println("Помилка: об'єкт не повинен бути створений");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилки: " + e.getMessage());
+        }
+        
+        System.out.println("\nСпроба створення книги з порожньою назвою та невалідним ISBN:");
+        try {
+            Author author = Author.of("Test", "Author", 1980);
+            Book invalidBook = Book.of("", author, "123", BookStatus.AVAILABLE);
+            System.err.println("Помилка: об'єкт не повинен бути створений");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилки: " + e.getMessage());
+            System.out.println("  Кількість помилок: " + e.getErrors().size());
+            e.getErrors().forEach(error -> System.out.println("    - " + error));
+        }
+        
+        System.out.println("\nСпроба створення читача з невалідним ID:");
+        try {
+            Reader invalidReader = Reader.of("John", "Doe", "abc");
+            System.err.println("Помилка: об'єкт не повинен бути створений");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилки: " + e.getMessage());
+        }
+        
+        System.out.println("\nСпроба створення позики з невалідним діапазоном дат:");
+        try {
+            Author author = Author.of("Test", "Author", 1980);
+            Book book = Book.of("Test Book", author, "9780451524935", BookStatus.AVAILABLE);
+            Reader reader = Reader.of("John", "Doe", "RD12345");
+            LocalDate start = LocalDate.now();
+            LocalDate end = start.minusDays(1);
+            Loan invalidLoan = Loan.of(book, reader, start, end);
+            System.err.println("Помилка: об'єкт не повинен бути створений");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилки: " + e.getMessage());
+        }
+        
+        System.out.println("\nСпроба створення членства з невалідним діапазоном дат:");
+        try {
+            Reader reader = Reader.of("John", "Doe", "RD12345");
+            LocalDate start = LocalDate.now();
+            LocalDate end = start.minusDays(1);
+            Membership invalidMembership = Membership.of(reader, start, end, MembershipType.STANDARD);
+            System.err.println("Помилка: об'єкт не повинен бути створений");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилки: " + e.getMessage());
+        }
+        
+        System.out.println("\n--- 3. Валідація в сеттерах ---");
+        
+        try {
+            Author author = Author.of("Test", "Author", 1980);
+            Book book = Book.of("Test Book", author, "9780451524935", BookStatus.AVAILABLE);
+            
+            System.out.println("Спроба встановити порожню назву через setter:");
+            book.setTitle("");
+            System.err.println("Помилка: сеттер не повинен прийняти невалідне значення");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилка: " + e.getMessage());
+        }
+        
+        try {
+            Author author = Author.of("Test", "Author", 1980);
+            Book book = Book.of("Test Book", author, "9780451524935", BookStatus.AVAILABLE);
+            
+            System.out.println("\nСпроба встановити невалідний ISBN через setter:");
+            book.setIsbn("123");
+            System.err.println("Помилка: сеттер не повинен прийняти невалідне значення");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилка: " + e.getMessage());
+        }
+        
+        try {
+            Author author = Author.of("Test", "Author", 1980);
+            Book book = Book.of("Test Book", author, "9780451524935", BookStatus.AVAILABLE);
+            Reader reader = Reader.of("John", "Doe", "RD12345");
+            Loan loan = Loan.of(book, reader, LocalDate.now(), LocalDate.now().plusDays(14));
+            
+            System.out.println("\nСпроба встановити невалідну дату повернення через setter:");
+            LocalDate invalidDate = LocalDate.now().minusDays(1);
+            loan.setReturnDate(invalidDate);
+            System.err.println("Помилка: сеттер не повинен прийняти невалідне значення");
+        } catch (ua.util.InvalidDataException e) {
+            System.out.println("Виняток викинуто коректно:");
+            System.out.println("  Помилка: " + e.getMessage());
+        }
+        
+        System.out.println("\n--- 4. Додавання валідних об'єктів до репозиторіїв ---");
+        
+        try {
+            BookRepository bookRepo = new BookRepository();
+            ReaderRepository readerRepo = new ReaderRepository();
+            
+            Author author1 = Author.of("George", "Orwell", 1903);
+            Author author2 = Author.of("Isaac", "Asimov", 1920);
+            
+            Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
+            Book book2 = Book.of("Foundation", author2, "9780553293357", BookStatus.CHECKED_OUT);
+            
+            Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
+            Reader reader2 = Reader.of("Maria", "Ivanova", "RD67890");
+            
+            bookRepo.add(book1);
+            bookRepo.add(book2);
+            readerRepo.add(reader1);
+            readerRepo.add(reader2);
+            
+            System.out.println("Успішно додано до репозиторіїв:");
+            System.out.println("  - Книг: " + bookRepo.size());
+            System.out.println("  - Читачів: " + readerRepo.size());
+            
+        } catch (ua.util.InvalidDataException e) {
+            System.err.println("Неочікувана помилка: " + e.getMessage());
+        }
+        
+        System.out.println("\n=== ДЕМОНСТРАЦІЯ ВАЛІДАЦІЇ ЗАВЕРШЕНА ===");
     }
 }

@@ -1,17 +1,33 @@
 package ua.library;
 
-import ua.util.Utils;
+import ua.util.DataValidator;
+import ua.util.InvalidDataException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public record Reader(String firstName, String lastName, String readerId) implements Comparable<Reader> {
     
+    private static final Logger logger = Logger.getLogger(Reader.class.getName());
+    
     public Reader {
-        Utils.validateString(firstName, "First name");
-        Utils.validateString(lastName, "Last name");
-        Utils.validateReaderId(readerId);
+        List<String> errors = new ArrayList<>();
+        
+        DataValidator.validateString(firstName, "firstName", errors);
+        DataValidator.validateString(lastName, "lastName", errors);
+        DataValidator.validateReaderId(readerId, errors);
+        
+        if (!errors.isEmpty()) {
+            logger.log(Level.SEVERE, "Failed to create Reader: {0}", errors);
+            throw new InvalidDataException(errors);
+        }
+        
+        logger.log(Level.INFO, "Reader created successfully: {0} ({1})", new Object[]{firstName + " " + lastName, readerId});
     }
     
-    public static Reader of(String firstName, String lastName, String readerId) {
+    public static Reader of(String firstName, String lastName, String readerId) throws InvalidDataException {
         return new Reader(firstName, lastName, readerId);
     }
     

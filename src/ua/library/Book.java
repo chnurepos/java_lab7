@@ -1,40 +1,50 @@
 package ua.library;
 
-import ua.util.Utils;
+import ua.util.DataValidator;
+import ua.util.InvalidDataException;
 import ua.enums.BookStatus;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class Book implements Comparable<Book> {
+    
+    private static final Logger logger = Logger.getLogger(Book.class.getName());
     
     private String title;
     private List<Author> authors;
     private String isbn;
     private BookStatus status;
     
-    public Book(String title, List<Author> authors, String isbn, BookStatus status) {
-        Utils.validateString(title, "Title");
-        Utils.validateISBN(isbn);
-        if (authors == null || authors.isEmpty()) {
-            throw new IllegalArgumentException("Book must have at least one author");
+    public Book(String title, List<Author> authors, String isbn, BookStatus status) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        
+        DataValidator.validateString(title, "title", errors);
+        DataValidator.validateISBN(isbn, errors);
+        DataValidator.validateNotEmpty(authors, "authors", errors);
+        DataValidator.validateNotNull(status, "status", errors);
+        
+        if (!errors.isEmpty()) {
+            logger.log(Level.SEVERE, "Failed to create Book: {0}", errors);
+            throw new InvalidDataException(errors);
         }
-        if (status == null) {
-            throw new IllegalArgumentException("Status cannot be null");
-        }
+        
         this.title = title;
         this.authors = new ArrayList<>(authors);
         this.isbn = isbn;
         this.status = status;
+        logger.log(Level.INFO, "Book created successfully: {0}", title);
     }
     
-    public static Book of(String title, Author author, String isbn, BookStatus status) {
+    public static Book of(String title, Author author, String isbn, BookStatus status) throws InvalidDataException {
         return new Book(title, List.of(author), isbn, status);
     }
     
-    public static Book of(String title, List<Author> authors, String isbn, BookStatus status) {
+    public static Book of(String title, List<Author> authors, String isbn, BookStatus status) throws InvalidDataException {
         return new Book(title, authors, isbn, status);
     }
     
@@ -42,8 +52,12 @@ public class Book implements Comparable<Book> {
         return title;
     }
     
-    public void setTitle(String title) {
-        Utils.validateString(title, "Title");
+    public void setTitle(String title) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        DataValidator.validateString(title, "title", errors);
+        DataValidator.throwIfErrors(errors);
+        
+        logger.log(Level.INFO, "Book title updated: {0}", title);
         this.title = title;
     }
     
@@ -51,10 +65,12 @@ public class Book implements Comparable<Book> {
         return Collections.unmodifiableList(authors);
     }
     
-    public void setAuthors(List<Author> authors) {
-        if (authors == null || authors.isEmpty()) {
-            throw new IllegalArgumentException("Book must have at least one author");
-        }
+    public void setAuthors(List<Author> authors) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        DataValidator.validateNotEmpty(authors, "authors", errors);
+        DataValidator.throwIfErrors(errors);
+        
+        logger.log(Level.INFO, "Book authors updated");
         this.authors = new ArrayList<>(authors);
     }
     
@@ -62,8 +78,12 @@ public class Book implements Comparable<Book> {
         return isbn;
     }
     
-    public void setIsbn(String isbn) {
-        Utils.validateISBN(isbn);
+    public void setIsbn(String isbn) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        DataValidator.validateISBN(isbn, errors);
+        DataValidator.throwIfErrors(errors);
+        
+        logger.log(Level.INFO, "Book ISBN updated: {0}", isbn);
         this.isbn = isbn;
     }
     
@@ -71,10 +91,12 @@ public class Book implements Comparable<Book> {
         return status;
     }
     
-    public void setStatus(BookStatus status) {
-        if (status == null) {
-            throw new IllegalArgumentException("Status cannot be null");
-        }
+    public void setStatus(BookStatus status) throws InvalidDataException {
+        List<String> errors = new ArrayList<>();
+        DataValidator.validateNotNull(status, "status", errors);
+        DataValidator.throwIfErrors(errors);
+        
+        logger.log(Level.INFO, "Book status updated: {0}", status);
         this.status = status;
     }
     
