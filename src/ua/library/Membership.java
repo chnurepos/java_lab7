@@ -3,9 +3,10 @@ package ua.library;
 import ua.util.Utils;
 import ua.enums.MembershipType;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 
-public class Membership {
+public class Membership implements Comparable<Membership> {
     
     private Reader reader;
     private LocalDate startDate;
@@ -127,5 +128,26 @@ public class Membership {
     @Override
     public int hashCode() {
         return Objects.hash(reader, startDate);
+    }
+    
+    @Override
+    public int compareTo(Membership other) {
+        return this.startDate.compareTo(other.startDate);
+    }
+    
+    public static Comparator<Membership> byEndDate() {
+        return Comparator.comparing(Membership::getEndDate);
+    }
+    
+    public static Comparator<Membership> byType() {
+        return Comparator.comparing(Membership::getType);
+    }
+    
+    public static Comparator<Membership> byReader() {
+        return Comparator.comparing(Membership::getReader);
+    }
+    
+    public static Comparator<Membership> byStartDateDescending() {
+        return Comparator.comparing(Membership::getStartDate).reversed();
     }
 }

@@ -17,6 +17,9 @@ public class Main {
         
         System.out.println("\n\n=== GENERIC REPOSITORY DEMONSTRATION ===\n");
         demonstrateRepository();
+        
+        System.out.println("\n\n=== SORTING DEMONSTRATION ===\n");
+        demonstrateSorting();
     }
     
     private static void demonstrateRecords() {
@@ -321,5 +324,153 @@ public class Main {
         }
         
         System.out.println("\n=== ДЕМОНСТРАЦІЯ РЕПОЗИТОРІЮ ЗАВЕРШЕНА ===");
+    }
+    
+    private static void demonstrateSorting() {
+        System.out.println("--- 1. Сортування книг ---");
+        BookRepository bookRepo = new BookRepository();
+        
+        Author author1 = Author.of("George", "Orwell", 1903);
+        Author author2 = Author.of("Isaac", "Asimov", 1920);
+        Author author3 = Author.of("Terry", "Pratchett", 1948);
+        Author author4 = Author.of("J.K.", "Rowling", 1965);
+        
+        Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
+        Book book2 = Book.of("Foundation", author2, "9780553293357", BookStatus.CHECKED_OUT);
+        Book book3 = Book.of("Good Omens", author3, "9780060853983", BookStatus.RESERVED);
+        Book book4 = Book.of("Animal Farm", author1, "9780451526342", BookStatus.AVAILABLE);
+        
+        bookRepo.add(book4);
+        bookRepo.add(book1);
+        bookRepo.add(book3);
+        bookRepo.add(book2);
+        
+        System.out.println("Книги до сортування:");
+        bookRepo.getAll().forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\nСортування за назвою (за замовчуванням):");
+        bookRepo.sortByTitle().forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\nСортування за ISBN:");
+        bookRepo.sortByIsbn().forEach(b -> System.out.println("  - " + b.getIsbn() + " - " + b.getTitle()));
+        
+        System.out.println("\nСортування за статусом:");
+        bookRepo.sortByStatus().forEach(b -> System.out.println("  - " + b.getStatus() + " - " + b.getTitle()));
+        
+        System.out.println("\nСортування за назвою (зворотний порядок):");
+        bookRepo.sortByTitleDescending().forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\n--- 2. Сортування читачів ---");
+        ReaderRepository readerRepo = new ReaderRepository();
+        
+        Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
+        Reader reader2 = Reader.of("Maria", "Ivanova", "RD67890");
+        Reader reader3 = Reader.of("Oleg", "Sidorov", "RD11111");
+        Reader reader4 = Reader.of("Anna", "Kovalenko", "RD99999");
+        
+        readerRepo.add(reader3);
+        readerRepo.add(reader1);
+        readerRepo.add(reader4);
+        readerRepo.add(reader2);
+        
+        System.out.println("Читачі до сортування:");
+        readerRepo.getAll().forEach(r -> System.out.println("  - " + r.readerId() + " - " + r.getFullName()));
+        
+        System.out.println("\nСортування за ID читача:");
+        readerRepo.sortByReaderId().forEach(r -> System.out.println("  - " + r.readerId() + " - " + r.getFullName()));
+        
+        System.out.println("\nСортування за ім'ям:");
+        readerRepo.sortByFirstName().forEach(r -> System.out.println("  - " + r.getFullName()));
+        
+        System.out.println("\nСортування за прізвищем:");
+        readerRepo.sortByLastName().forEach(r -> System.out.println("  - " + r.getFullName()));
+        
+        System.out.println("\n--- 3. Сортування авторів ---");
+        AuthorRepository authorRepo = new AuthorRepository();
+        
+        Author author5 = Author.of("Stephen", "King", 1947);
+        authorRepo.add(author3);
+        authorRepo.add(author1);
+        authorRepo.add(author5);
+        authorRepo.add(author2);
+        authorRepo.add(author4);
+        
+        System.out.println("Автори до сортування:");
+        authorRepo.getAll().forEach(a -> System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
+        
+        System.out.println("\nСортування за прізвищем та ім'ям:");
+        authorRepo.sortByName().forEach(a -> System.out.println("  - " + a.getFullName()));
+        
+        System.out.println("\nСортування за роком народження:");
+        authorRepo.sortByBirthYear().forEach(a -> System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
+        
+        System.out.println("\nСортування за роком народження (зворотний порядок):");
+        authorRepo.sortByBirthYearDescending().forEach(a -> System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
+        
+        System.out.println("\n--- 4. Сортування позик ---");
+        LoanRepository loanRepo = new LoanRepository();
+        
+        LocalDate date1 = LocalDate.now().minusDays(10);
+        LocalDate date2 = LocalDate.now().minusDays(5);
+        LocalDate date3 = LocalDate.now().minusDays(15);
+        
+        Loan loan1 = Loan.of(book1, reader1, date2, date2.plusDays(14));
+        Loan loan2 = Loan.of(book2, reader2, date1, date1.plusDays(21));
+        Loan loan3 = Loan.of(book3, reader3, date3, date3.plusDays(14));
+        
+        loanRepo.add(loan2);
+        loanRepo.add(loan1);
+        loanRepo.add(loan3);
+        
+        System.out.println("Позики до сортування:");
+        loanRepo.getAll().forEach(l -> System.out.println("  - " + l.getBook().getTitle() + " - " + l.getIssueDate()));
+        
+        System.out.println("\nСортування за датою видачі:");
+        loanRepo.sortByIssueDate().forEach(l -> System.out.println("  - " + l.getIssueDate() + " - " + l.getBook().getTitle()));
+        
+        System.out.println("\nСортування за датою повернення:");
+        loanRepo.sortByReturnDate().forEach(l -> System.out.println("  - " + l.getReturnDate() + " - " + l.getBook().getTitle()));
+        
+        System.out.println("\nСортування за назвою книги:");
+        loanRepo.sortByBookTitle().forEach(l -> System.out.println("  - " + l.getBook().getTitle() + " - " + l.getIssueDate()));
+        
+        System.out.println("\n--- 5. Сортування членства ---");
+        MembershipRepository membershipRepo = new MembershipRepository();
+        
+        LocalDate start1 = LocalDate.now().minusMonths(6);
+        LocalDate start2 = LocalDate.now().minusMonths(3);
+        LocalDate start3 = LocalDate.now().minusMonths(12);
+        
+        Membership membership1 = Membership.of(reader1, start2, start2.plusYears(1), MembershipType.PREMIUM);
+        Membership membership2 = Membership.of(reader2, start1, start1.plusYears(1), MembershipType.STANDARD);
+        Membership membership3 = Membership.of(reader3, start3, start3.plusYears(1), MembershipType.STUDENT);
+        
+        membershipRepo.add(membership2);
+        membershipRepo.add(membership1);
+        membershipRepo.add(membership3);
+        
+        System.out.println("Членства до сортування:");
+        membershipRepo.getAll().forEach(m -> System.out.println("  - " + m.getReader().getFullName() + " - " + m.getStartDate()));
+        
+        System.out.println("\nСортування за датою початку:");
+        membershipRepo.sortByStartDate().forEach(m -> System.out.println("  - " + m.getStartDate() + " - " + m.getReader().getFullName()));
+        
+        System.out.println("\nСортування за типом:");
+        membershipRepo.sortByType().forEach(m -> System.out.println("  - " + m.getType() + " - " + m.getReader().getFullName()));
+        
+        System.out.println("\nСортування за читачем:");
+        membershipRepo.sortByReader().forEach(m -> System.out.println("  - " + m.getReader().getFullName() + " - " + m.getType()));
+        
+        System.out.println("\n--- 6. Сортування через sortByIdentity ---");
+        System.out.println("Сортування книг за identity (asc):");
+        bookRepo.sortByIdentity("asc").forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\nСортування книг за identity (desc):");
+        bookRepo.sortByIdentity("desc").forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\nСортування читачів за identity (asc):");
+        readerRepo.sortByIdentity("asc").forEach(r -> System.out.println("  - " + r.readerId() + " - " + r.getFullName()));
+        
+        System.out.println("\n=== ДЕМОНСТРАЦІЯ СОРТУВАННЯ ЗАВЕРШЕНА ===");
     }
 }

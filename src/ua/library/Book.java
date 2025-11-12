@@ -4,10 +4,11 @@ import ua.util.Utils;
 import ua.enums.BookStatus;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-public class Book {
+public class Book implements Comparable<Book> {
     
     private String title;
     private List<Author> authors;
@@ -107,5 +108,26 @@ public class Book {
     @Override
     public int hashCode() {
         return Objects.hash(isbn);
+    }
+    
+    @Override
+    public int compareTo(Book other) {
+        return this.title.compareToIgnoreCase(other.title);
+    }
+    
+    public static Comparator<Book> byIsbn() {
+        return Comparator.comparing(Book::getIsbn);
+    }
+    
+    public static Comparator<Book> byStatus() {
+        return Comparator.comparing(Book::getStatus);
+    }
+    
+    public static Comparator<Book> byFirstAuthor() {
+        return Comparator.comparing(book -> book.getAuthors().get(0), Author::compareTo);
+    }
+    
+    public static Comparator<Book> byTitleDescending() {
+        return Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER).reversed();
     }
 }

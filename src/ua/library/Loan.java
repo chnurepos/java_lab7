@@ -2,9 +2,10 @@ package ua.library;
 
 import ua.util.Utils;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 
-public class Loan {
+public class Loan implements Comparable<Loan> {
     
     private Book book;
     private Reader reader;
@@ -108,5 +109,26 @@ public class Loan {
     @Override
     public int hashCode() {
         return Objects.hash(book, reader, issueDate);
+    }
+    
+    @Override
+    public int compareTo(Loan other) {
+        return this.issueDate.compareTo(other.issueDate);
+    }
+    
+    public static Comparator<Loan> byReturnDate() {
+        return Comparator.comparing(Loan::getReturnDate, Comparator.nullsLast(Comparator.naturalOrder()));
+    }
+    
+    public static Comparator<Loan> byBookTitle() {
+        return Comparator.comparing(loan -> loan.getBook().getTitle(), String.CASE_INSENSITIVE_ORDER);
+    }
+    
+    public static Comparator<Loan> byReader() {
+        return Comparator.comparing(Loan::getReader);
+    }
+    
+    public static Comparator<Loan> byIssueDateDescending() {
+        return Comparator.comparing(Loan::getIssueDate).reversed();
     }
 }

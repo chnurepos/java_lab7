@@ -100,6 +100,35 @@ public class GenericRepository<T> {
         logger.log(Level.INFO, "Repository cleared. Removed {0} items", size);
     }
     
+    public List<T> sortByIdentity(String order) {
+        if (order == null || order.isEmpty()) {
+            logger.log(Level.WARNING, "Sort order is null or empty, using default");
+            order = "asc";
+        }
+        
+        List<T> sorted = new ArrayList<>(items);
+        
+        if (sorted.isEmpty()) {
+            logger.log(Level.FINE, "Repository is empty, nothing to sort");
+            return sorted;
+        }
+        
+        if (!(sorted.get(0) instanceof Comparable)) {
+            logger.log(Level.WARNING, "Items do not implement Comparable, cannot sort by identity");
+            return sorted;
+        }
+        
+        if ("desc".equalsIgnoreCase(order) || "descending".equalsIgnoreCase(order)) {
+            sorted.sort(Collections.reverseOrder());
+            logger.log(Level.INFO, "Sorted {0} items in descending order by identity", sorted.size());
+        } else {
+            Collections.sort(sorted);
+            logger.log(Level.INFO, "Sorted {0} items in ascending order by identity", sorted.size());
+        }
+        
+        return sorted;
+    }
+    
     @Override
     public String toString() {
         return "GenericRepository{size=" + items.size() + "}";
