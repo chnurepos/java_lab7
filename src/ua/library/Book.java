@@ -80,10 +80,10 @@ public class Book implements Comparable<Book> {
     
     public String getStatusInfo() {
         return switch (status) {
-            case AVAILABLE -> "✓ Available - Ready for checkout";
-            case CHECKED_OUT -> "✗ Checked Out - Currently borrowed";
-            case RESERVED -> "⊙ Reserved - Waiting for pickup";
-            case LOST -> "⚠ Lost - Not available";
+            case AVAILABLE -> "Available - Ready for checkout";
+            case CHECKED_OUT -> "Checked Out - Currently borrowed";
+            case RESERVED -> "Reserved - Waiting for pickup";
+            case LOST -> "Lost - Not available";
         };
     }
     

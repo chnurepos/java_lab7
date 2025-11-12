@@ -28,9 +28,9 @@ public class GenericRepositoryTest {
         System.out.println("Total: " + (testsPassed + testsFailed));
         
         if (testsFailed == 0) {
-            System.out.println("\n✓ All tests passed!");
+            System.out.println("\nAll tests passed!");
         } else {
-            System.out.println("\n✗ Some tests failed!");
+            System.out.println("\nSome tests failed!");
         }
     }
     
@@ -62,7 +62,7 @@ public class GenericRepositoryTest {
         assertEquals(1, all.size(), "getAll should return 1 item");
         assertTrue(all.contains(book2), "getAll should contain book2");
         
-        System.out.println("✓ Book Repository tests passed\n");
+        System.out.println("Book Repository tests passed\n");
     }
     
     private static void testReaderRepository() {
@@ -85,7 +85,7 @@ public class GenericRepositoryTest {
         assertTrue(repo.remove(reader1), "Should remove reader1");
         assertNull(repo.findByIdentity("RD00001"), "Should not find removed reader");
         
-        System.out.println("✓ Reader Repository tests passed\n");
+        System.out.println("Reader Repository tests passed\n");
     }
     
     private static void testAuthorRepository() {
@@ -106,7 +106,7 @@ public class GenericRepositoryTest {
         assertNotNull(found, "Should find author by identity");
         assertEquals(author1, found, "Found author should equal author1");
         
-        System.out.println("✓ Author Repository tests passed\n");
+        System.out.println("Author Repository tests passed\n");
     }
     
     private static void testLoanRepository() {
@@ -133,7 +133,7 @@ public class GenericRepositoryTest {
         Loan found = repo.findByIdentity(identity);
         assertNotNull(found, "Should find loan by identity");
         
-        System.out.println("✓ Loan Repository tests passed\n");
+        System.out.println("Loan Repository tests passed\n");
     }
     
     private static void testMembershipRepository() {
@@ -155,7 +155,7 @@ public class GenericRepositoryTest {
         Membership found = repo.findByIdentity(identity);
         assertNotNull(found, "Should find membership by identity");
         
-        System.out.println("✓ Membership Repository tests passed\n");
+        System.out.println("Membership Repository tests passed\n");
     }
     
     private static void testDuplicateHandling() {
@@ -175,7 +175,7 @@ public class GenericRepositoryTest {
         
         assertFalse(repo.add(book1), "Should not add same book twice");
         
-        System.out.println("✓ Duplicate Handling tests passed\n");
+        System.out.println("Duplicate Handling tests passed\n");
     }
     
     private static void testNullHandling() {
@@ -189,7 +189,7 @@ public class GenericRepositoryTest {
         assertFalse(repo.remove(null), "Should not remove null item");
         assertNull(repo.findByIdentity(null), "Should return null for null identity");
         
-        System.out.println("✓ Null Handling tests passed\n");
+        System.out.println("Null Handling tests passed\n");
     }
     
     private static void testEmptyRepository() {
@@ -206,7 +206,7 @@ public class GenericRepositoryTest {
         repo.clear();
         assertTrue(repo.isEmpty(), "Repository should be empty after clear");
         
-        System.out.println("✓ Empty Repository tests passed\n");
+        System.out.println("Empty Repository tests passed\n");
     }
     
     private static void assertTrue(boolean condition, String message) {

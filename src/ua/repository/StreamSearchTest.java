@@ -28,9 +28,9 @@ public class StreamSearchTest {
         System.out.println("Total: " + (testsPassed + testsFailed));
         
         if (testsFailed == 0) {
-            System.out.println("\n✓ All tests passed!");
+            System.out.println("\nAll tests passed!");
         } else {
-            System.out.println("\n✗ Some tests failed!");
+            System.out.println("\nSome tests failed!");
         }
     }
     
@@ -68,7 +68,7 @@ public class StreamSearchTest {
         Map<BookStatus, Long> countByStatus = repo.countByStatus();
         assertEquals(2L, countByStatus.get(BookStatus.AVAILABLE), "Should have 2 AVAILABLE books");
         
-        System.out.println("✓ BookRepository Search tests passed\n");
+        System.out.println("BookRepository Search tests passed\n");
     }
     
     private static void testReaderRepositorySearch() {
@@ -100,7 +100,7 @@ public class StreamSearchTest {
         Map<String, Long> countByLastName = repo.countByLastName();
         assertEquals(2L, countByLastName.get("Doe"), "Should have 2 readers with last name Doe");
         
-        System.out.println("✓ ReaderRepository Search tests passed\n");
+        System.out.println("ReaderRepository Search tests passed\n");
     }
     
     private static void testAuthorRepositorySearch() {
@@ -130,7 +130,7 @@ public class StreamSearchTest {
         double avgYear = repo.getAverageBirthYear();
         assertTrue(avgYear > 1900 && avgYear < 2000, "Average year should be between 1900 and 2000");
         
-        System.out.println("✓ AuthorRepository Search tests passed\n");
+        System.out.println("AuthorRepository Search tests passed\n");
     }
     
     private static void testLoanRepositorySearch() {
@@ -166,7 +166,7 @@ public class StreamSearchTest {
         Optional<Loan> oldest = repo.findOldestLoan();
         assertTrue(oldest.isPresent(), "Should find oldest loan");
         
-        System.out.println("✓ LoanRepository Search tests passed\n");
+        System.out.println("LoanRepository Search tests passed\n");
     }
     
     private static void testMembershipRepositorySearch() {
@@ -194,7 +194,7 @@ public class StreamSearchTest {
         Map<MembershipType, Long> countByType = repo.countByType();
         assertEquals(1L, countByType.get(MembershipType.PREMIUM), "Should have 1 PREMIUM membership");
         
-        System.out.println("✓ MembershipRepository Search tests passed\n");
+        System.out.println("MembershipRepository Search tests passed\n");
     }
     
     private static void testTerminalOperations() {
@@ -221,7 +221,7 @@ public class StreamSearchTest {
             assertTrue(book != null, "forEach should process all books");
         });
         
-        System.out.println("✓ Terminal Operations tests passed\n");
+        System.out.println("Terminal Operations tests passed\n");
     }
     
     private static void assertTrue(boolean condition, String message) {

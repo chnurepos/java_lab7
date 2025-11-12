@@ -26,9 +26,9 @@ public class SortingTest {
         System.out.println("Total: " + (testsPassed + testsFailed));
         
         if (testsFailed == 0) {
-            System.out.println("\n✓ All tests passed!");
+            System.out.println("\nAll tests passed!");
         } else {
-            System.out.println("\n✗ Some tests failed!");
+            System.out.println("\nSome tests failed!");
         }
     }
     
@@ -54,7 +54,7 @@ public class SortingTest {
         List<Book> sortedByIsbn = repo.sortByIsbn();
         assertEquals("1111111111", sortedByIsbn.get(0).getIsbn(), "First ISBN should be 1111111111");
         
-        System.out.println("✓ Book Sorting tests passed\n");
+        System.out.println("Book Sorting tests passed\n");
     }
     
     private static void testReaderSorting() {
@@ -79,7 +79,7 @@ public class SortingTest {
         List<Reader> sortedByLastName = repo.sortByLastName();
         assertEquals("Adams", sortedByLastName.get(0).lastName(), "First last name should be Adams");
         
-        System.out.println("✓ Reader Sorting tests passed\n");
+        System.out.println("Reader Sorting tests passed\n");
     }
     
     private static void testAuthorSorting() {
@@ -104,7 +104,7 @@ public class SortingTest {
         List<Author> sortedByYearDesc = repo.sortByBirthYearDescending();
         assertEquals(2000, sortedByYearDesc.get(0).birthYear(), "First birth year descending should be 2000");
         
-        System.out.println("✓ Author Sorting tests passed\n");
+        System.out.println("Author Sorting tests passed\n");
     }
     
     private static void testLoanSorting() {
@@ -132,7 +132,7 @@ public class SortingTest {
         List<Loan> sortedByBookTitle = repo.sortByBookTitle();
         assertEquals("Book A", sortedByBookTitle.get(0).getBook().getTitle(), "First book title should be Book A");
         
-        System.out.println("✓ Loan Sorting tests passed\n");
+        System.out.println("Loan Sorting tests passed\n");
     }
     
     private static void testMembershipSorting() {
@@ -158,7 +158,7 @@ public class SortingTest {
         List<Membership> sortedByType = repo.sortByType();
         assertEquals(MembershipType.PREMIUM, sortedByType.get(1).getType(), "Second type should be PREMIUM");
         
-        System.out.println("✓ Membership Sorting tests passed\n");
+        System.out.println("Membership Sorting tests passed\n");
     }
     
     private static void testSortByIdentity() {
@@ -193,7 +193,7 @@ public class SortingTest {
         List<Reader> sortedReaders = readerRepo.sortByIdentity("asc");
         assertEquals("RD11111", sortedReaders.get(0).readerId(), "First reader ID should be RD11111");
         
-        System.out.println("✓ sortByIdentity tests passed\n");
+        System.out.println("sortByIdentity tests passed\n");
     }
     
     private static void assertTrue(boolean condition, String message) {

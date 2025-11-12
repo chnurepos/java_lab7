@@ -23,6 +23,9 @@ public class Main {
         
         System.out.println("\n\n=== STREAM API SEARCH DEMONSTRATION ===\n");
         demonstrateStreamSearch();
+        
+        System.out.println("\n\n=== SERIALIZATION DEMONSTRATION ===\n");
+        demonstrateSerialization();
     }
     
     private static void demonstrateRecords() {
@@ -657,5 +660,111 @@ public class Main {
         System.out.println("Прискорення: " + String.format("%.2f", (double) streamTime / parallelTime) + "x");
         
         System.out.println("\n=== ДЕМОНСТРАЦІЯ ПОШУКУ ТА STREAM API ЗАВЕРШЕНА ===");
+    }
+    
+    private static void demonstrateSerialization() {
+        System.out.println("--- 1. Завантаження конфігурації ---");
+        System.out.println("JSON path для books: " + ua.util.ConfigLoader.getJsonPath("books"));
+        System.out.println("YAML path для books: " + ua.util.ConfigLoader.getYamlPath("books"));
+        System.out.println("Кількість тестових книг: " + ua.util.ConfigLoader.getTestDataCount("books"));
+        
+        System.out.println("\n--- 2. Генерація тестових даних ---");
+        ua.repository.AuthorRepository authorRepo = ua.util.TestDataGenerator.generateAuthorRepository();
+        ua.repository.BookRepository bookRepo = ua.util.TestDataGenerator.generateBookRepository();
+        ua.repository.ReaderRepository readerRepo = ua.util.TestDataGenerator.generateReaderRepository();
+        ua.repository.LoanRepository loanRepo = ua.util.TestDataGenerator.generateLoanRepository(bookRepo, readerRepo);
+        ua.repository.MembershipRepository membershipRepo = ua.util.TestDataGenerator.generateMembershipRepository(readerRepo);
+        
+        System.out.println("Створено:");
+        System.out.println("  - Авторів: " + authorRepo.size());
+        System.out.println("  - Книг: " + bookRepo.size());
+        System.out.println("  - Читачів: " + readerRepo.size());
+        System.out.println("  - Позик: " + loanRepo.size());
+        System.out.println("  - Членств: " + membershipRepo.size());
+        
+        System.out.println("\n--- 3. Збереження у JSON та YAML ---");
+        try {
+            ua.repository.RepositorySerializer.saveBookRepository(bookRepo);
+            ua.repository.RepositorySerializer.saveReaderRepository(readerRepo);
+            ua.repository.RepositorySerializer.saveAuthorRepository(authorRepo);
+            ua.repository.RepositorySerializer.saveLoanRepository(loanRepo);
+            ua.repository.RepositorySerializer.saveMembershipRepository(membershipRepo);
+            System.out.println("Всі репозиторії успішно збережено");
+        } catch (ua.util.DataSerializationException e) {
+            System.err.println("Помилка збереження: " + e.getMessage());
+        }
+        
+        System.out.println("\n--- 4. Завантаження з JSON ---");
+        try {
+            ua.repository.BookRepository loadedBookRepo = ua.repository.RepositorySerializer.loadBookRepository();
+            ua.repository.ReaderRepository loadedReaderRepo = ua.repository.RepositorySerializer.loadReaderRepository();
+            ua.repository.AuthorRepository loadedAuthorRepo = ua.repository.RepositorySerializer.loadAuthorRepository();
+            ua.repository.LoanRepository loadedLoanRepo = ua.repository.RepositorySerializer.loadLoanRepository();
+            ua.repository.MembershipRepository loadedMembershipRepo = ua.repository.RepositorySerializer.loadMembershipRepository();
+            
+            System.out.println("Завантажено:");
+            System.out.println("  - Авторів: " + loadedAuthorRepo.size());
+            System.out.println("  - Книг: " + loadedBookRepo.size());
+            System.out.println("  - Читачів: " + loadedReaderRepo.size());
+            System.out.println("  - Позик: " + loadedLoanRepo.size());
+            System.out.println("  - Членств: " + loadedMembershipRepo.size());
+            
+            System.out.println("\n--- 5. Порівняння даних ---");
+            boolean booksMatch = bookRepo.size() == loadedBookRepo.size();
+            boolean readersMatch = readerRepo.size() == loadedReaderRepo.size();
+            boolean authorsMatch = authorRepo.size() == loadedAuthorRepo.size();
+            
+            System.out.println("Кількість книг збігається: " + booksMatch);
+            System.out.println("Кількість читачів збігається: " + readersMatch);
+            System.out.println("Кількість авторів збігається: " + authorsMatch);
+            
+            if (booksMatch && loadedBookRepo.size() > 0) {
+                Book original = bookRepo.getAll().get(0);
+                Book loaded = loadedBookRepo.getAll().get(0);
+                System.out.println("\nПорівняння першої книги:");
+                System.out.println("  Оригінал: " + original.getTitle() + " (" + original.getIsbn() + ")");
+                System.out.println("  Завантажена: " + loaded.getTitle() + " (" + loaded.getIsbn() + ")");
+                System.out.println("  Збігаються: " + original.getTitle().equals(loaded.getTitle()) && 
+                                 original.getIsbn().equals(loaded.getIsbn()));
+            }
+            
+            if (readersMatch && loadedReaderRepo.size() > 0) {
+                Reader original = readerRepo.getAll().get(0);
+                Reader loaded = loadedReaderRepo.getAll().get(0);
+                System.out.println("\nПорівняння першого читача:");
+                System.out.println("  Оригінал: " + original.getFullName() + " (" + original.readerId() + ")");
+                System.out.println("  Завантажений: " + loaded.getFullName() + " (" + loaded.readerId() + ")");
+                System.out.println("  Збігаються: " + original.readerId().equals(loaded.readerId()));
+            }
+            
+        } catch (ua.util.DataSerializationException e) {
+            System.err.println("Помилка завантаження: " + e.getMessage());
+        }
+        
+        System.out.println("\n--- 6. Завантаження з YAML ---");
+        try {
+            ua.repository.BookRepository yamlBookRepo = ua.repository.RepositorySerializer.loadBookRepositoryFromYaml();
+            System.out.println("Завантажено книг з YAML: " + yamlBookRepo.size());
+            System.out.println("YAML завантаження успішне");
+        } catch (ua.util.DataSerializationException e) {
+            System.err.println("Помилка завантаження YAML: " + e.getMessage());
+        }
+        
+        System.out.println("\n--- 7. Демонстрація обробки винятків ---");
+        try {
+            ua.util.DataSerializer.loadFromJson("nonexistent_file.json", Book.class);
+            System.err.println("Повинна бути помилка для неіснуючого файлу");
+        } catch (ua.util.DataSerializationException e) {
+            System.out.println("Виняток оброблено коректно: " + e.getMessage());
+        }
+        
+        try {
+            ua.util.DataSerializer.loadFromYaml("nonexistent_file.yaml", Reader.class);
+            System.err.println("Повинна бути помилка для неіснуючого файлу");
+        } catch (ua.util.DataSerializationException e) {
+            System.out.println("Виняток оброблено коректно: " + e.getMessage());
+        }
+        
+        System.out.println("\n=== ДЕМОНСТРАЦІЯ СЕРІАЛІЗАЦІЇ ЗАВЕРШЕНА ===");
     }
 }
