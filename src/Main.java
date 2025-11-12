@@ -20,6 +20,9 @@ public class Main {
         
         System.out.println("\n\n=== SORTING DEMONSTRATION ===\n");
         demonstrateSorting();
+        
+        System.out.println("\n\n=== STREAM API SEARCH DEMONSTRATION ===\n");
+        demonstrateStreamSearch();
     }
     
     private static void demonstrateRecords() {
@@ -472,5 +475,187 @@ public class Main {
         readerRepo.sortByIdentity("asc").forEach(r -> System.out.println("  - " + r.readerId() + " - " + r.getFullName()));
         
         System.out.println("\n=== ДЕМОНСТРАЦІЯ СОРТУВАННЯ ЗАВЕРШЕНА ===");
+    }
+    
+    private static void demonstrateStreamSearch() {
+        System.out.println("--- 1. Пошук книг ---");
+        BookRepository bookRepo = new BookRepository();
+        
+        Author author1 = Author.of("George", "Orwell", 1903);
+        Author author2 = Author.of("Isaac", "Asimov", 1920);
+        Author author3 = Author.of("Terry", "Pratchett", 1948);
+        
+        Book book1 = Book.of("1984", author1, "9780451524935", BookStatus.AVAILABLE);
+        Book book2 = Book.of("Animal Farm", author1, "9780451526342", BookStatus.CHECKED_OUT);
+        Book book3 = Book.of("Foundation", author2, "9780553293357", BookStatus.AVAILABLE);
+        Book book4 = Book.of("Good Omens", author3, "9780060853983", BookStatus.RESERVED);
+        
+        bookRepo.add(book1);
+        bookRepo.add(book2);
+        bookRepo.add(book3);
+        bookRepo.add(book4);
+        
+        System.out.println("Пошук за назвою '1984':");
+        bookRepo.findByTitle("1984").forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\nПошук за назвою, що містить 'Farm':");
+        bookRepo.findByTitleContains("Farm").forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\nПошук за статусом AVAILABLE:");
+        bookRepo.findByStatus(BookStatus.AVAILABLE).forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\nПошук за автором:");
+        bookRepo.findByAuthor(author1).forEach(b -> System.out.println("  - " + b.getTitle()));
+        
+        System.out.println("\nВсі назви книг (map + collect):");
+        bookRepo.getAllTitles().forEach(title -> System.out.println("  - " + title));
+        
+        System.out.println("\nВсі автори (flatMap + collect):");
+        bookRepo.getAllAuthors().forEach(a -> System.out.println("  - " + a.getFullName()));
+        
+        System.out.println("\nПідрахунок за статусом (collect):");
+        bookRepo.countByStatus().forEach((status, count) -> 
+            System.out.println("  - " + status + ": " + count));
+        
+        System.out.println("\n--- 2. Пошук читачів ---");
+        ReaderRepository readerRepo = new ReaderRepository();
+        
+        Reader reader1 = Reader.of("Ivan", "Petrov", "RD12345");
+        Reader reader2 = Reader.of("Maria", "Ivanova", "RD67890");
+        Reader reader3 = Reader.of("Ivan", "Sidorov", "RD11111");
+        
+        readerRepo.add(reader1);
+        readerRepo.add(reader2);
+        readerRepo.add(reader3);
+        
+        System.out.println("Пошук за ім'ям 'Ivan':");
+        readerRepo.findByFirstName("Ivan").forEach(r -> System.out.println("  - " + r.getFullName()));
+        
+        System.out.println("\nВсі імена (map + distinct + collect):");
+        readerRepo.getAllFirstNames().forEach(name -> System.out.println("  - " + name));
+        
+        System.out.println("\nПідрахунок за прізвищем (collect):");
+        readerRepo.countByLastName().forEach((lastName, count) -> 
+            System.out.println("  - " + lastName + ": " + count));
+        
+        System.out.println("\n--- 3. Пошук авторів ---");
+        AuthorRepository authorRepo = new AuthorRepository();
+        
+        Author author4 = Author.of("Stephen", "King", 1947);
+        authorRepo.add(author1);
+        authorRepo.add(author2);
+        authorRepo.add(author3);
+        authorRepo.add(author4);
+        
+        System.out.println("Пошук за діапазоном років (1900-1950):");
+        authorRepo.findByBirthYearRange(1900, 1950).forEach(a -> 
+            System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
+        
+        System.out.println("\nНайстаріший автор:");
+        authorRepo.findOldest().ifPresent(a -> 
+            System.out.println("  - " + a.getFullName() + " (" + a.birthYear() + ")"));
+        
+        System.out.println("\nСередній рік народження (reduce через average):");
+        System.out.println("  - " + authorRepo.getAverageBirthYear());
+        
+        System.out.println("\n--- 4. Пошук позик ---");
+        LoanRepository loanRepo = new LoanRepository();
+        
+        LocalDate date1 = LocalDate.now().minusDays(20);
+        LocalDate date2 = LocalDate.now().minusDays(5);
+        LocalDate date3 = LocalDate.now().minusDays(30);
+        
+        Loan loan1 = Loan.of(book1, reader1, date2, date2.plusDays(14));
+        Loan loan2 = Loan.of(book2, reader2, date1, date1.plusDays(21));
+        Loan loan3 = Loan.of(book3, reader1, date3, date3.plusDays(14));
+        
+        loanRepo.add(loan1);
+        loanRepo.add(loan2);
+        loanRepo.add(loan3);
+        
+        System.out.println("Пошук позик читача:");
+        loanRepo.findByReader(reader1).forEach(l -> 
+            System.out.println("  - " + l.getBook().getTitle() + " - " + l.getIssueDate()));
+        
+        System.out.println("\nПошук прострочених позик:");
+        loanRepo.findOverdue().forEach(l -> 
+            System.out.println("  - " + l.getBook().getTitle() + " (повернення: " + l.getReturnDate() + ")"));
+        
+        System.out.println("\nПідрахунок позик за читачем (collect):");
+        loanRepo.countByReader().forEach((reader, count) -> 
+            System.out.println("  - " + reader.getFullName() + ": " + count));
+        
+        System.out.println("\n--- 5. Пошук членства ---");
+        MembershipRepository membershipRepo = new MembershipRepository();
+        
+        LocalDate start1 = LocalDate.now().minusMonths(6);
+        LocalDate start2 = LocalDate.now().minusMonths(3);
+        
+        Membership membership1 = Membership.of(reader1, start2, start2.plusYears(1), MembershipType.PREMIUM);
+        Membership membership2 = Membership.of(reader2, start1, start1.plusYears(1), MembershipType.STANDARD);
+        Membership membership3 = Membership.of(reader3, start1, start1.plusYears(1), MembershipType.STUDENT);
+        
+        membershipRepo.add(membership1);
+        membershipRepo.add(membership2);
+        membershipRepo.add(membership3);
+        
+        System.out.println("Активні членства:");
+        membershipRepo.findActive().forEach(m -> 
+            System.out.println("  - " + m.getReader().getFullName() + " - " + m.getType()));
+        
+        System.out.println("\nПошук за типом PREMIUM:");
+        membershipRepo.findByType(MembershipType.PREMIUM).forEach(m -> 
+            System.out.println("  - " + m.getReader().getFullName()));
+        
+        System.out.println("\nПідрахунок за типом (collect):");
+        membershipRepo.countByType().forEach((type, count) -> 
+            System.out.println("  - " + type + ": " + count));
+        
+        System.out.println("\n--- 6. Термінальні операції: forEach ---");
+        System.out.println("Виведення всіх книг через forEach:");
+        bookRepo.getAll().forEach(book -> {
+            System.out.println("  - " + book.getTitle() + " (" + book.getStatus() + ")");
+        });
+        
+        System.out.println("\n--- 7. Термінальні операції: reduce ---");
+        System.out.println("Сума років народження авторів (reduce):");
+        int totalYears = authorRepo.getAll().stream()
+                .mapToInt(Author::birthYear)
+                .reduce(0, Integer::sum);
+        System.out.println("  - Сума: " + totalYears);
+        
+        System.out.println("\nМаксимальний рік народження (reduce):");
+        int maxYear = authorRepo.getAll().stream()
+                .mapToInt(Author::birthYear)
+                .reduce(Integer.MIN_VALUE, Integer::max);
+        System.out.println("  - Максимум: " + maxYear);
+        
+        System.out.println("\n--- 8. Порівняння stream vs parallelStream ---");
+        List<Book> largeBookList = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            largeBookList.add(Book.of("Book " + i, author1, "ISBN" + i, BookStatus.AVAILABLE));
+        }
+        BookRepository largeRepo = new BookRepository();
+        largeBookList.forEach(largeRepo::add);
+        
+        System.out.println("Тестування на " + largeRepo.size() + " книгах");
+        
+        long startTime = System.nanoTime();
+        long count1 = largeRepo.getAll().stream()
+                .filter(book -> book.getTitle().contains("5"))
+                .count();
+        long streamTime = System.nanoTime() - startTime;
+        
+        startTime = System.nanoTime();
+        long count2 = largeRepo.getAll().parallelStream()
+                .filter(book -> book.getTitle().contains("5"))
+                .count();
+        long parallelTime = System.nanoTime() - startTime;
+        
+        System.out.println("Stream результат: " + count1 + " (час: " + streamTime / 1_000_000 + " мс)");
+        System.out.println("ParallelStream результат: " + count2 + " (час: " + parallelTime / 1_000_000 + " мс)");
+        System.out.println("Прискорення: " + String.format("%.2f", (double) streamTime / parallelTime) + "x");
+        
+        System.out.println("\n=== ДЕМОНСТРАЦІЯ ПОШУКУ ТА STREAM API ЗАВЕРШЕНА ===");
     }
 }
